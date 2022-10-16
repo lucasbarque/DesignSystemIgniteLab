@@ -1,13 +1,14 @@
-name: Deploy docs
+name: Deploy Storybook
 
 on:
   push:
     branches:
-     - main
+      - main
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -16,16 +17,14 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16
-          cache: 'npm'
 
-      - run: npm ci
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
 
-      - run: npm run build
-        env:
-          TURBO_TOKEN: vOI1zD3eFj0kcJWyEbaHhJ4o
-          TURBO_TEAM: barque
+      - name: Build Storybook
+        run: npm run build-storybook
 
-      - name: Deploy storybook
+      - name: Deploy Storybook
         run: npm run deploy-storybook -- --ci --existing-output-dir=storybook-static
         env:
           GH_TOKEN: ${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}
